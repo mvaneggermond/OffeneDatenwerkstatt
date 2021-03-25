@@ -1,0 +1,203 @@
+---
+title: "R Basics"
+author: "Michael van Eggermond"
+date: "24/03/2021"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Welcome
+
+In this tutorial we will show you some basics in R, prior to diving into the user interface of RStudio in the next tutorial. It is important to understand these basics as they will help you later in data analysis and visualization. In addition, these concepts are not only relevant for working with R.
+
+This tutorials builds on several publicly available tutorials and books. These include:
+
+* [RStudio Primers: the basics](https://rstudio.cloud/learn/primers/1)
+* [R Tutorial for Beginners at statmethods](https://www.statmethods.net/r-tutorial/index.html)
+* _R for Data Science_ by Hadley Wickham and Garrett Grolemund, published by O’Reilly Media, Inc., 2016, ISBN: 9781491910399. You can purchase the book at [shop.oreilly.com](http://shop.oreilly.com/product/0636920034407.do). The book is available on as well [here](https://r4ds.had.co.nz/introduction.html)
+
+Let's go to the next section and delve into R!
+
+## Operators
+
+Operators (German: Operator) tell the computer what to do. There are two main types of operators: arithmetic operator, to perform calculations, and logical operators. You will be familiar with almost all of these operators from your math courses or work with Excel.
+
+### Arithemthic operators
+
+The table below list the arithmetic operators available in R
+
+Operator Description
+-------- -----------
++        Addition
+-        Subtraction
+*        Multiplication
+/        Division
+^or**    Exponentiation
+
+This code computes the answer to one plus one. Change it
+so it computes two plus two:
+
+```{r two-plus-two, exercise=TRUE}
+1+1
+```
+
+The code below computes the factorial of 4. 
+
+```{r factorial-by-hand, exercise=TRUE}
+4*3*2*1
+```
+
+You can also combine multiple operators and use parentheses, similar to in Excel or when writing a calculation by hand. Feel free to change any of the code below to experiment with the different operators. 
+
+```{r combining-operators, exercise=TRUE}
+(2/4)*2-1
+```
+
+### Logical operators
+
+Logical operators are listed in the able below. 
+
+Operator Description
+-------- -----------
+\>       Greater than
+\>\=     Greater than or equal to 
+\<       Less than
+\<\=     Less than or equal to 
+==       Exactly equal to
+!=       Not equal to
+
+We will look into more other operators in coming tutorials and the usage of operators in several cases. 
+
+```{r logical-operators, exercise=TRUE}
+# Is 2 greater than 1?
+2 > 1
+# Is 2 smaller than 1?
+2 < 1
+# Are these two strings equal?
+"ab"=="ab"
+```
+
+## Data types
+
+A data type or simply 'type' is an attribute of data which tells a computer how you programmer intend to use the data. Most programming languages support basic data types of integer numbers (of varying sizes), floating-point numbers (which approximate real numbers), characters and Booleans (see [Wikipedia](https://en.wikipedia.org/wiki/Data_type). 
+
+R has 6 basic data types. Five of these data types are: 
+
+* **character**: `"a"`, `"swc"`
+* **numeric**: `7`, `15.5`
+* **integer**: `2L` (the `L` tells R to store this as an integer)
+* **logical**: `TRUE`, `FALSE`
+* **complex**: `1+4i` (complex numbers with real and imaginary parts)
+
+If you would like to know the data type one of an object, you can use one of the commands (functions) listed in the box below. We will look closer at functions in the coming sections.
+
+```{r check-data-types, exercise=TRUE}
+typeof("ab")
+length("ab")
+class("ab")
+str("ab")
+
+typeof(1)
+length(1)
+class(1)
+str(1)
+```
+
+You will have noted that I wrote the text ab between double quotes (`"`). In R you denote text, in programming often called a *string*with a quote (`'`) or double quote (`"`). I recommend using `"` It is important to both open and close the string. 
+
+Programming languages have varying degrees of 'type safety'. This means that the computer might check that you are not trying to sum up a text and a number. It is helpful to understand data types, as common errors often boil down to errors regarding data types.
+
+Have a look at the calculation below where an attempt is made to add two strings. You will note that when the code is executed R returns an error. 
+
+```{r sum-of-strings, exercise=TRUE}
+# Calculating the sum of two strings
+
+"a" + "b"
+```
+
+If would like to learn more about strings in R, I suggest chapter 14 of the book _R for Data Science_, available [here](https://r4ds.had.co.nz/strings.html). We will cover some of the topics 
+
+## Variables & assignment
+
+You might have seen in the previous exercises that I used the string "ab" very often and might have wondered whether it would be possible to this a bit smarter by reusing the string "ab". Indeed, it is possible to _assign_ a _variable_ to (almost) everything. More precisely, a variable provides us with named storage that a program can manipulate. 
+
+A valid variable name consists of letters, numbers and the dot or underline characters. The variable name starts with a letter or the dot not followed by a number [(tutorialpoints.com)](https://www.tutorialspoint.com/r/r_variables.htm).
+
+There are different ways to assign a variable. We will use the following operator: `<-` in this tutorial. This is called leftward assignment. You can also assign with an equals sign (`=`) or using rightward assignment (`->`). 
+
+Have a look at the code below. The number `1` is assigned to the variable `one`. The number `2` is assigned to the variable `two`. We compute the sum of one and two and assign this to the variable `solution`. You can view the solution by simply typing solution or by executing the command *print(solution)*.
+
+```{r variable-assignment, exercise=TRUE}
+# Assigning 1 to one
+one <- 1
+# Assigning 2 to two
+two <- 2
+# Computing the sum of 1 + 2
+solution <- one + two
+# Viewing the solution
+solution
+# Printing the solution
+print(solution)
+
+```
+## Functions & arguments
+
+### Functions
+By now you will have seen that we use commands from time to time. In programming these commands are often called _functions_ and make something happen. Remember that we just computed the factorial by multiplying `4*3*2*1`. Fortunately, the programmers of R have written a function to make life easier and there is a function called `factorial`. Have a look at the code below, where the function `factorial` is called.
+
+```{r factorial, exercise=TRUE}
+# Calculating factorial with a function
+factorial(4)
+```
+
+There are several important elements to note when using functions:
+
+1. If you type the name of a function itself, R will return the code of the function. For some functions the code might not be helpful at first, but it might help you later on, especially when you write your own functions.
+2. To run a function, you need to place parentheses after a function name. If a function requires any input to do it's job, you place this input the parentheses.
+3. If you place a question mark before the function name, R will print a help page for the function.
+
+```{r factorial-as-function, echo=TRUE}
+# Print the code
+factorial
+# Calculate something
+factorial(4)
+# Show the help page when working directly in RStudio
+?factorial
+```
+
+Now it is your turn to run a function. Compute the square root of 962 with the function `sqrt`  in the code block below,
+
+```{r function-assignment, exercise=TRUE}
+
+```
+
+
+### Arguments
+
+Some functions, like `sqrt`
+
+
+
+
+
+## Vectors, matrices & data frames
+
+
+
+## Packages
+
+
+## Getting Help
+
+
+## References & Literature
+
+The tutorial is excerpted from _R for Data Science_ by Hadley Wickham and Garrett Grolemund, published by O’Reilly Media, Inc., 2016, ISBN: 9781491910399. You can purchase the book at [shop.oreilly.com](http://shop.oreilly.com/product/0636920034407.do).
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. 
+
