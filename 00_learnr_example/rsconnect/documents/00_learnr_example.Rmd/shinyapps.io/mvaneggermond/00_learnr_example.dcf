@@ -1,0 +1,12 @@
+name: 00_learnr_example
+title: 00_learnr_example
+username:
+account: mvaneggermond
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3844907
+bundleId: 4389592
+url: https://mvaneggermond.shinyapps.io/00_learnr_example/
+when: 1616594705.55486
+asMultiple: FALSE
+asStatic: FALSE
