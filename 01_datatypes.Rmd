@@ -124,7 +124,7 @@ If would like to learn more about strings in R, I suggest chapter 14 of the book
 
 ## Variables & assignment
 
-You might have seen in the previous exercises that I used the string "ab" very often and might have wondered whether it would be possible to this a bit smarter by reusing the string "ab". Indeed, it is possible to _assign_ a _variable_ to (almost) everything. More precisely, a variable provides us with named storage that a program can manipulate. 
+You might have seen in the previous exercises that I used the string "ab" very often and might have wondered whether it would be possible to this a bit smarter by reusing the string "ab". Indeed, it is possible to _assign_ a _variable_ to (almost) everything. More precisely, a variable provides us with named storage that a program can manipulate. These variables are also objects. In this section, I will stick to the term variable. 
 
 A valid variable name consists of letters, numbers and the dot or underline characters. The variable name starts with a letter or the dot not followed by a number [(tutorialpoints.com)](https://www.tutorialspoint.com/r/r_variables.htm).
 
@@ -145,6 +145,41 @@ solution
 print(solution)
 
 ```
+
+ You can overwrite a variable with a new name simply by assigning a new value to a variable. 
+
+Let's have a look at th more closely. 
+
+```{r variable-assignment-overwrite, exercise=TRUE}
+# Assigning 1 to one
+one <- 1
+# Assigning 2 to two
+one <- 2
+# Computing the sum of one plus one
+solution <- one + one
+# Printing the solution
+print(solution)
+
+
+```
+
+Remember that we just spoke type safe, and the varying degrees of implementation of type safety. Not only can you overwrite a variable, you can also change the data type.
+
+```{r variable-assignment-overwrite-type, exercise=TRUE}
+# Assigning 1 to one
+one <- 1
+# Assigning 2 to two
+two <- 2
+# Changing the data type
+two <- "2"
+# Computing the sum of one plus one
+new_solution <- one + two
+
+
+
+```
+
+
 ## Functions & arguments
 
 ### Functions
@@ -179,25 +214,153 @@ Now it is your turn to run a function. Compute the square root of 962 with the f
 
 ### Arguments
 
-Some functions, like `sqrt`
+Some functions, like `sqrt`, require an input between the parentheses. This input is called an *argument*. The function `sqrt` only requires a single argument; other functions do not require an argument. Take for example the function `Sys.date`. This function does not require an argument. 
+
+```{r function-arguments-sysdate, exercise=TRUE}
+
+Sys.Date()
+
+```
 
 
 
+Functions can also require more arguments. Arguments are separated by a comma (`,`). By typing `?` prior to the function name, you will see the arguments a function requires in the help page. You can also type `args(function_name)` to view the arguments. 
+
+```{r function-arguments-log, exercise=TRUE}
+
+args(log)
+
+```
+
+The function log takes two argument:`x` and `base`. Not all arguments are always required. In this case, a default value for the argument is used. It is always good to check what the default value is. 
+
+```{r example-named-arguments, echo=TRUE}
+# Log - would this be 1 or will this be another value?
+log(10)
+# Let's explicitly set a base number. 
+log(10,10)
+# With named arguments
+log(x=10,base=10)
+```
+
+A common function is the function `paste` to combine multiple strings or other elements.  The code block below shows the function `paste`. The argument `sep` is a named argument and is short for separator. Go ahead and try to change the separator to another character. 
+
+```{r function-arguments, exercise=TRUE}
+
+paste("Open","Data",sep=" ")
+
+```
+## Vectors
+
+R stores every value as a vector. A vector is simply a collection of data elements of the same type. You can create a vector with the `c` function. 
+
+```{r example-vectors, echo=TRUE}
+# A vector of numbers
+c(1,2,3)
+# A vector of strings
+c("apple","pear","banana")
+# Generate a vector with random numbers
+rnorm(10)
+# Or generate a series
+seq(from=1,to=10,by=2)
+```
+
+If you want to, you can assign each value a name in a vector. 
+
+```{r example-named-vector, exercise=TRUE}
+# A vector of numbers
+c(a=1,b=2,c=3)
+```
+
+Remember, you can also assign vector to variable. Now you understand why the word *object* is more approriate.
+
+```{r example-vector-assignment, exercise=TRUE}
+# A vector of numbers
+num_vector <- c(a=1,b=2,c=3)
+
+print(num_vector)
+```
 
 
-## Vectors, matrices & data frames
+Creating your own vector can come in useful. Many R functions are vectorised and expect a vector as input. For instance, you can calculate the sum of a vector or calculate the mean of a vector.
 
+```{r example-vector-calculation, exercise=TRUE}
+# A vector of numbers
+num_vector <- c(a=1,b=2,c=3,d=4,e=5)
+# The mean of the vector 
+mean(num_vector)
+# The sum of a vector
+sum(num_vector)
+# The standard deviation of a vector
+sd(num_vector)
+# Or the summary of a vector
+summary(num_vector)
+```
+
+There also functions that take multiple vectors as an input. These functions evaluate the vectors row-by-row. 
+
+```{r example-function-two-vectors, exercise=TRUE}
+# Vector 1
+vector <- c(1,2,3,4,5)
+# Vector 2
+vector2 <- c(5,4,3,2,1)
+# The maximum of both vectors
+pmax(vector,vector2)
+
+```
+
+You will learn more of these functions as we go along in the tutorial. 
+
+
+## Data frames
 
 
 ## Packages
 
+Up to now, we have functions that are available in **base R**. The true power of R lies in the tremendous amount of packages that have been written for R. Packages are nothing more than a range of functions. Each of these packages comes with documentation and a help file. R does not load all these packages when you start working with R as this might require lots of storage space. Also, naming between functions of different packages might overlap and can lead to unwanted results.
+
+### Loading packages
+
+A package is loaded with the function `library`. For instance, the package `dplyr`, which we will use extensively in this course is loaded by typing `library(dplyr)`. Another library that we will look at is the `ggplot2` library.  
+
+The `ggplot` function comes with the `ggplot2` library. Let's see what happens if we call the function ggplot.
+
+```{r library, exercise=TRUE}
+ggplot
+```
+
+Indeed, an error message appears. Prior to calling the function in your script, you need to load the library. You only need to do this at the beginning of your script. Later, we will see that you only need to do this once in your work environment after starting R. 
+
+
+```{r library-load, exercise=TRUE}
+library(ggplot2)
+ggplot
+```
+
+### Installing packages
+
+Packages do not come installed with R. If you install R you need to the packages you want to use as well. Again, there is a function to install packages. This function takes as argument a vector of libraries you would like to install; it downloads and install the package. By executing this command you install the package `ggplot2`: `install.packages(c("ggplot2"))`.
+
+### Common errors with packages
+
+The most common error when working with multiple packages is that function names between packages overlap. I've listed a common example below. By looking closely at the messages you will see that the functions `intersect, setdiff, setequal, union` are masked from the package `base`. The package `plyr` masks a number of functions from the package `dplyr`. You can either change the sequence of the packages or you can call functions explicitly by first naming the library and then the function. If, in this case, you would like to use the function `rename` from `dplyr` you would call the function as follows: `dplyr::rename`. 
+
+```{r library-load-warning, exercise=TRUE}
+library(dplyr)
+library(plyr)
+```
 
 ## Getting Help
 
 
 ## References & Literature
 
-The tutorial is excerpted from _R for Data Science_ by Hadley Wickham and Garrett Grolemund, published by O’Reilly Media, Inc., 2016, ISBN: 9781491910399. You can purchase the book at [shop.oreilly.com](http://shop.oreilly.com/product/0636920034407.do).
+This tutorials builds on several publicly available tutorials and books. These include:
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. 
+* [RStudio Primers: the basics](https://rstudio.cloud/learn/primers/1)
+* [R Tutorial for Beginners at statmethods](https://www.statmethods.net/r-tutorial/index.html)
+* _R for Data Science_ by Hadley Wickham and Garrett Grolemund, published by O’Reilly Media, Inc., 2016, ISBN: 9781491910399. You can purchase the book at [shop.oreilly.com](http://shop.oreilly.com/product/0636920034407.do). The book is available on as well [here](https://r4ds.had.co.nz/introduction.html)
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. It makes use of the learnr package. 
 
