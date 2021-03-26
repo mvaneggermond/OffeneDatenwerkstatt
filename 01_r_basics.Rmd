@@ -311,10 +311,6 @@ pmax(vector,vector2)
 
 You will learn more of these functions as we go along in the tutorial. 
 
-
-## Data frames
-
-
 ## Packages
 
 Up to now, we have functions that are available in **base R**. The true power of R lies in the tremendous amount of packages that have been written for R. Packages are nothing more than a range of functions. Each of these packages comes with documentation and a help file. R does not load all these packages when you start working with R as this might require lots of storage space. Also, naming between functions of different packages might overlap and can lead to unwanted results.
