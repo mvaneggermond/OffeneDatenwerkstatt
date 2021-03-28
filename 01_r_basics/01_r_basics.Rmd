@@ -10,7 +10,13 @@ runtime: shiny_prerendered
 library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
 ```
+```{r warning=FALSE, echo=FALSE, results='hide', message=FALSE}
 
+df_count_data <- read.csv("_data/2021_verkehrszaehlungen_werte_fussgaenger_velo.csv", stringsAsFactors = FALSE)
+
+
+
+```
 ## Welcome
 
 In this tutorial we will show you some basics in R, prior to diving into the user interface of RStudio in the next tutorial. It is important to understand these basics as they will help you later in data analysis and visualization. In addition, these concepts are not only relevant for working with R.
@@ -146,7 +152,7 @@ print(solution)
 
 ```
 
- You can overwrite a variable with a new name simply by assigning a new value to a variable. 
+You can overwrite a variable with a new name simply by assigning a new value to a variable. 
 
 Let's have a look at th more closely. 
 
@@ -174,11 +180,19 @@ two <- 2
 two <- "2"
 # Computing the sum of one plus one
 new_solution <- one + two
-
-
-
 ```
 
+Finally, it is possible that variables and fields are empty. For people not coming from programming, this can be something new. At this point in time, I would like to delve into too much detail, but keep in mind that there are can be `NA` values in your data - not available. These `NA` values are not interpreted as `0` in calculations. Rather, summing up `NA` values will lead to a `NA` results.
+
+```{r variable-NA, exercise=TRUE}
+# NA
+
+na <- NA
+one <- 1
+
+one + na
+
+```
 
 ## Functions & arguments
 
@@ -297,6 +311,18 @@ sd(num_vector)
 summary(num_vector)
 ```
 
+Remember that we just spoke about `NA` values? Have a look at the functions below. 
+
+```{r example-vector-calculation-na, exercise=TRUE}
+# A vector of numbers
+num_vector <- c(a=1,b=2,c=3,d=4,e=5,f=NA)
+# The mean of the vector 
+mean(num_vector)
+# The mean of the vector with NA excluded with na.rm = TRUE
+mean(num_vector,na.rm=TRUE)
+
+```
+
 There also functions that take multiple vectors as an input. These functions evaluate the vectors row-by-row. 
 
 ```{r example-function-two-vectors, exercise=TRUE}
@@ -310,6 +336,54 @@ pmax(vector,vector2)
 ```
 
 You will learn more of these functions as we go along in the tutorial. 
+
+## Dataframes & tibbles
+
+Different structures are available to store data in R. These are vectors, lists, matrices and data frames, and more recently, tibbles. In this section, we will look closer at data frames and tibbles. 
+
+
+### Dataframes 
+
+A data frame is used for storing tables and contains vectors of equal length. Each vector can have it's own data type. Have a look at the code below, in which three vectors are combined to a single data frame.
+
+```{r first-dataframe, exercise=TRUE}
+
+student_names <- c("Student one", "Student two", "Student three")
+student_study <- c("Architecture","Civil engineering","Geomatics")
+student_age <- c(24,22,25)
+
+df_students <- data.frame(student_names,student_study,student_age)
+
+```
+
+Several commands are extremely useful when working with data frames. These are:
+
+* To determine the number of rows you can use `nrow(my_dataframe) `
+* To determine the number of columns you can use  `ncol(my_dataframe)  `
+* To view the first rows you can use the command  `head(my_dataframe) `. By adding  `n ` you can specify the number of rows  `head(my_dataframe, n=10) `
+* To view a list of the columns and their data types you can type  `str() `
+
+
+I loaded a data frame called `df_count_data` into R. Try the commands above in the box below.
+
+```{r basic-dataframe, exercise=TRUE}
+
+head(df_count_data)
+
+```
+
+### Tibbles
+
+A tibble is a special type of table. R displays tibbles in a refined way whenever you have the tibble package loaded: R will print only the first ten rows of a tibble as well as all of the columns that fit into your console window. R also adds useful summary information about the tibble, such as the data types of each column and the size of the data set.
+
+Whenever you do not have the tibble packages loaded, R will display the tibble as if it were a data frame. In fact, tibbles are data frames, an enhanced type of data frame.
+
+
+```{r as_tibble, exercise=TRUE, exercise.lines = 5}
+
+as_tibble(df_count_data)
+
+```
 
 ## Packages
 

@@ -1,0 +1,82 @@
+---
+title: "Data import"
+author: "Michael van Eggermond"
+date: "24/03/2021"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE)
+
+
+```
+```{r warning=FALSE, echo=FALSE, results='hide', message=FALSE}
+
+df_count_data <- read.csv("_data/2021_verkehrszaehlungen_werte_fussgaenger_velo.csv", stringsAsFactors = FALSE)
+
+
+
+```
+
+## Welcome
+
+In this tutorial we look at importing data into R.
+
+This tutorials builds on several publicly available tutorials and books. These include:
+
+* [RStudio Primers: Work with Data](https://rstudio.cloud/learn/primers/2)
+* Chapter 11 from _R for Data Science_ by Hadley Wickham and Garrett Grolemund, published by O’Reilly Media, Inc., 2016, ISBN: 9781491910399. You can purchase the book at [shop.oreilly.com](http://shop.oreilly.com/product/0636920034407.do). The book is available on as well [here](https://r4ds.had.co.nz/introduction.html)
+
+
+
+
+## Importing data
+
+When working with R, generating empty data frames from scratch or from vectors is something that you will not need in the beginning. Rather, you import data into R for further analysis. 
+
+### Text files
+
+To import text files, you can either use the function `read.csv` from base R or `read_csv` from the package `readr`. 
+
+
+```{r readcsv-example, echo=TRUE}
+# Read the data
+df_count_data <- read.csv("_data/2021_verkehrszaehlungen_werte_fussgaenger_velo.csv", stringsAsFactors = FALSE)
+
+head(df_count_data)
+
+df_count_tibble <- read_csv("_data/2021_verkehrszaehlungen_werte_fussgaenger_velo.csv")
+
+df_count_tibble
+
+```
+
+### Excel files
+
+To import Excel files you can use the function `readxl` and `readxlsx` from the package `readxl`. Have a look at the screen shot below of the data stored in the worksheet `Velo_2019` in the range  `C31:I54`. 
+
+```{r fig1, echo = FALSE, out.width = "50%", fig.cap = "Zahlstelle 908 Grenzacherstrasse (Kraftwerk)"}
+
+knitr::include_graphics("images/zahlstelle_xlsx.png")
+
+```
+
+In the code below I specify the range, sheet and column names. 
+
+```{r readxl-example, echo=TRUE}
+# Read the data
+df_zahlstelle <- readxl::read_xlsx("_data/Jahresreport_908.xlsx", sheet='Velo 2019', 
+                                  col_names = c("dtv_r1", "dtv_r2","dtv_total","dtv_anteil","dwv_r1", "dwv_r2","dwv_total"),
+                                  range='C31:I54')
+
+head(df_zahlstelle)
+
+```
+
+### Spatial data
+
+To import spatial data you can use the function `st_read` from the package `sf`. 
+
