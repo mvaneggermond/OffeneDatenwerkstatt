@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 ```{r warning=FALSE, echo=FALSE, results='hide', message=FALSE}
 
-df_count_data <- read.csv("_data/2021_verkehrszaehlungen_werte_fussgaenger_velo.csv", stringsAsFactors = FALSE)
+df_count_data <- read.csv("data/2021_verkehrszaehlungen_werte_fussgaenger_velo.csv", stringsAsFactors = FALSE)
 
 
 
@@ -24,6 +24,7 @@ In this tutorial we will show you some basics in R, prior to diving into the use
 This tutorials builds on several publicly available tutorials and books. These include:
 
 * [RStudio Primers: the basics](https://rstudio.cloud/learn/primers/1)
+* [RStudio Primers: Work with Data](https://rstudio.cloud/learn/primers/2)
 * [R Tutorial for Beginners at statmethods](https://www.statmethods.net/r-tutorial/index.html)
 * _R for Data Science_ by Hadley Wickham and Garrett Grolemund, published by O’Reilly Media, Inc., 2016, ISBN: 9781491910399. You can purchase the book at [shop.oreilly.com](http://shop.oreilly.com/product/0636920034407.do). The book is available on as well [here](https://r4ds.had.co.nz/introduction.html)
 
