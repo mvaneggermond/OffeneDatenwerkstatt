@@ -16,9 +16,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Welcome
 
-In this tutorial we will be looking at RStudio's interface. More specifically, we will be looking at RStudio Server
-
-
+In this tutorial we will be looking at RStudio's interface. More specifically, we will be looking at RStudio Server. RStudio provides a GUI to working with the software R. It is freely available and comes as stand-alone software or as a server version.
 
 ## RStudio Interface
 
@@ -38,7 +36,7 @@ knitr::include_graphics("images/rstudio_cloud.png")
 
 ### Script window
 
-In the script window, you write your code. You can execute your code by pressing **command+enter** (OS X),  **CTRL+Enter** (Windows) or pressing **Run** in the top bar of the Script window.
+In the script window, you write your code. You can execute your code by pressing **command+enter** (OS X),  **CTRL+Enter** (Windows) or pressing **Run** in the top bar of the Script window. If you don't have a script window yet, you can open a script by heading to **File -> New File -> R Script**. 
 
 When you type code, you will note that, from time to time, RStudio offers suggestions for auto completing code. For instance, when typing `read_csv`. 
 
@@ -48,11 +46,27 @@ knitr::include_graphics("images/read_csv.png")
 
 ```
 
+If you type `View(my_df)` a new tab will open with the contents of a loaded data frame. 
+
+
 ### Console
 
-The results of the code you run will appear 
+The results of the code you run will appear in the console on the bottom left.
 
+
+### Environment
+
+The objects that you have loaded in your environment will appear in the environment window.
+
+### Files, Plots, Packages, Help
+
+The bottom right window provides you with five tabs:
+
+* **Files**: An explorer to view your files. 
+* **Plots**: Any plots that you might have generated
+* **Packages**: An overview of the packages that are available and installed.
+* **Help**: Documentation of R. Accessed by typing `?package_name` or `?function_name`
 
 ## Installing R and RStudio
 
-To follow
+The web page [Installing R and RStudio](https://rstudio-education.github.io/hopr/starting.html) offers a good introduction to installing R and RStudio on your local machine. 
