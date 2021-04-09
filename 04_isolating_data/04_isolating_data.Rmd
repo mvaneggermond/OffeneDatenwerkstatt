@@ -2,23 +2,38 @@
 title: "Working with data"
 author: "Michael van Eggermond"
 date: "09/04/2021"
-output: learnr::tutorial
+output: 
+  learnr::tutorial: 
+    css: style.css
 runtime: shiny_prerendered
 ---
+```{css, echo=FALSE}
+p.caption {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: grey;
+  margin-right: 10%;
+  margin-left: 0%;  
+  text-align: left;
+}
+```
+
 
 ```{r setup, include=FALSE}
 library(learnr)
 library(tidyverse)
 library(lubridate)
+library(scales)
 knitr::opts_chunk$set(echo = FALSE)
 
 
 ```
-```{r warning=FALSE, echo=FALSE, results='hide', message=FALSE}
+```{r warning=FALSE, echo=FALSE,message=FALSE}
 
 
 df_counts_zurich <- readr::read_csv("data/zurich_aggregated_2018_2021.csv") %>%
   dplyr::select(-year,-month,-day,-hour)
+
 
 
 
@@ -33,7 +48,39 @@ In this tutorial we will look at the following topics:
 
 We will use data downloaded and processed from the Open Data Portal of the municipality of Zurich. This data set contains pedestrian and bicycle counts between 2018 and 2021. The quarterly hour counts have been summed to hourly counts. I added a description of the count location to the data set.
 
-The raw counts are available at the Open Data Portal of the municiplaity of Zurich [here](https://data.stadt-zuerich.ch/dataset/sid_dav_verkehrszaehlung_miv_od2031). The scirpt
+```{r warning=FALSE, echo=FALSE,message=FALSE}
+
+
+
+df_counts_zurich_viz <- df_counts_zurich %>% 
+  dplyr::filter(bezeichnung%in%c('Mythenquai',
+                                 'Langstrasse (Unterführung Nord)',
+                                 'Hardbrücke Süd (Seite HB)',
+                                 'Langstrasse (Unterführung Süd)'))%>%
+  mutate(year=lubridate::year(datum),
+         month=lubridate::month(datum),
+         simple_date=lubridate::make_datetime(year=year,month=month),
+         velo_korrigiert=total_velo*korrekturfaktor)%>%
+  group_by(bezeichnung,simple_date,year,month)%>%
+  summarise(sum_velo=sum(velo_korrigiert,na.rm=T))
+
+
+ggplot(df_counts_zurich_viz,aes(x=simple_date,y=sum_velo))+ 
+  geom_line(aes(group = bezeichnung,colour=bezeichnung))+
+  scale_x_datetime(date_labels = "%b-%Y",breaks = date_breaks("3 month"))+
+  xlab("\nMonth")+
+ ylab("Monthly cyclists\n")+ 
+  #theme_bw()+
+  theme(legend.position="bottom", legend.box="vertical", legend.margin=margin())+
+  theme(axis.text.x=element_text(angle=90,hjust=1)) + 
+  scale_color_discrete(guide=guide_legend(nrow=2))
+
+
+
+
+```
+
+The raw counts are available at the Open Data Portal of the municiplaity of Zurich [here](https://data.stadt-zuerich.ch/dataset/sid_dav_verkehrszaehlung_miv_od2031). The scripts to convert the raw data to aggregated counts are available on the repository [here](https://github.com/mvaneggermond/OffeneDatenwerkstatt).
 
 
 
@@ -121,7 +168,7 @@ tibble_counts_zurich
 
 ```
 
-```{r fig4, echo = FALSE, out.width = "80%", fig.cap = "Output of the command View(df_counts_zurich)"}
+```{r fig5, echo = FALSE, out.width = "80%", fig.cap = "Output of the command View(df_counts_zurich)"}
 
 knitr::include_graphics("images/example_tibble.png")
 
