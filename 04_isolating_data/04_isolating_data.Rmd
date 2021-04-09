@@ -1,0 +1,166 @@
+---
+title: "Working with data"
+author: "Michael van Eggermond"
+date: "09/04/2021"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+library(lubridate)
+knitr::opts_chunk$set(echo = FALSE)
+
+
+```
+```{r warning=FALSE, echo=FALSE, results='hide', message=FALSE}
+
+
+df_counts_zurich <- readr::read_csv("data/zurich_aggregated_2018_2021.csv") %>%
+  dplyr::select(-year,-month,-day,-hour)
+
+
+
+
+```
+
+## Welcome
+
+In this tutorial we will look at the following topics:
+
+* Selecting data with `select`, `filter`, `summarize`, `filter`, `group_by` data with the tidyverse packages. 
+
+We will use data downloaded and processed from the Open Data Portal of the municipality of Zurich. This data set contains pedestrian and bicycle counts between 2018 and 2021. The quarterly hour counts have been summed to hourly counts. I added a description of the count location to the data set.
+
+The raw counts are available at the Open Data Portal of the municiplaity of Zurich [here](https://data.stadt-zuerich.ch/dataset/sid_dav_verkehrszaehlung_miv_od2031). The scirpt
+
+
+
+```{r warning=FALSE, echo=FALSE,  message=FALSE}
+
+
+#df_counts_zurich <- readr::read_csv("data/zurich_aggregated_2018_2021.csv") 
+
+
+```
+
+## Recap: Data frames & tibbles
+
+In the previous tutorial we looked at data frames, but a brief recap might be in place:
+
+* A data frame consists of rows and columns. 
+* All columns in a data frame have the same length; data in each column is of the same data type. 
+
+
+When conducting exploratory data analysis, some extra definitions are:
+* We also refer to the columns as variables: a variable is stored in a column
+* Each row contains an observaton (e.g. a set of counts per 15 minutes)
+* Each cell contains a value
+
+These concepts are also shown in the figure below.
+
+
+```{r fig1, echo = FALSE, out.width = "80%", fig.cap = "Data frames, rows and columns"}
+
+knitr::include_graphics("images/df_row_columns.png")
+
+```
+
+### Data frames
+
+Remember, when you are working with data frames, by simply typing the command below, **R** will output all rows of the data frame. In **RStudio** these rows will be outputted in the console pane in the bottom left. 
+
+```{r warning=FALSE, echo=TRUE,  message=FALSE,results='hide'}
+
+df_counts_zurich
+
+```
+
+```{r fig2, echo = FALSE, out.width = "80%", fig.cap = "Output of the command df_counts_zurich"}
+
+knitr::include_graphics("images/example_df.png")
+
+```
+If you would like to view the first rows of your data frame, use the command `head(your_df_name)`, **R** will output the first rows of the data frame. In **RStudio** these rows will be outputted in the console pane in the bottom left. 
+
+
+```{r fig3, echo = FALSE, out.width = "80%", fig.cap = "Output of the command head(df_counts_zurich)"}
+
+knitr::include_graphics("images/example_head_df.png")
+
+```
+
+If you would like to view the entire data frame, use the command `View(your_df_name)`, **RStudio** will open a new pane in the top right window.
+
+
+```{r fig4, echo = FALSE, out.width = "80%", fig.cap = "Output of the command View(df_counts_zurich)"}
+
+knitr::include_graphics("images/example_view_df.png")
+
+```
+
+### Tibble
+
+A tibble is a special type of table.R will print only the first ten rows of a tibble as well as all of the columns that fit into your console window. R also adds useful summary information about the tibble, such as the data types of each column and the size of the data set. When you are working with the `tidyverse` packages, data frames will often be converted to `tibbles`.  
+
+You can change a data frame to a tibble by running the command below. 
+
+```{r warning=FALSE, echo=TRUE,  message=FALSE,results='hide'}
+
+tibble_counts_zurich <- tibble::as_tibble(df_counts_zurich)
+
+
+```
+
+If you would like to view the contents of the tibble, simply type the command below. You see that only a limited number of columns are shown, a limited number of rows and the data type of each column. This is very useful when working with data in R. 
+
+```{r warning=FALSE, echo=TRUE,  message=FALSE,results='hide'}
+
+tibble_counts_zurich 
+
+```
+
+```{r fig4, echo = FALSE, out.width = "80%", fig.cap = "Output of the command View(df_counts_zurich)"}
+
+knitr::include_graphics("images/example_tibble.png")
+
+```
+If you would like to change the `tibble` back to a data frame, simply use the code below. 
+```{r warning=FALSE, echo=TRUE,  message=FALSE,results='hide'}
+
+df_counts_zurich <- as.data.frame(tibble_counts_zurich)
+
+```
+Tibbles are data frames, but an enhanced type of data frame. You will find out that some packages do not like to work with tibbles yet, but converting between data frames and tibbles is very easy!
+
+## Select
+
+```{r select, exercise=TRUE}
+1+1
+```
+
+
+## Filter
+
+```{r filter, exercise=TRUE}
+1+1
+```
+
+
+## Pipe
+
+```{r group_by, exercise=TRUE}
+1+1
+```
+
+## Summarise
+
+```{r summarise, exercise=TRUE}
+1+1
+```
+
+## Group by
+
+
+## Arrange

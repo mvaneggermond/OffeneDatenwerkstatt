@@ -125,12 +125,10 @@ $(document).ready(function () {
 <li><a href="https://rstudio.cloud/learn/primers/2">RStudio Primers: Work with Data</a></li>
 <li>Chapter 11 from <em>R for Data Science</em> by Hadley Wickham and Garrett Grolemund, published by O’Reilly Media, Inc., 2016, ISBN: 9781491910399. You can purchase the book at <a href="http://shop.oreilly.com/product/0636920034407.do">shop.oreilly.com</a>. The book is available on as well <a href="https://r4ds.had.co.nz/introduction.html">here</a></li>
 </ul>
-</div>
-<div id="section-importing-data" class="section level2">
-<h2>Importing data</h2>
 <p>When working with R, generating empty data frames from scratch or from vectors is something that you will not need in the beginning. Rather, you import data into R for further analysis.</p>
-<div id="section-text-files" class="section level3">
-<h3>Text files</h3>
+</div>
+<div id="section-importing-text-files" class="section level2">
+<h2>Importing text files</h2>
 <p>To import text files, you can either use the function <code>read.csv</code> from base R or <code>read_csv</code> from the package <code>readr</code>.</p>
 <pre class="r"><code># Read the data
 df_count_data &lt;- read.csv(&quot;data/2021_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;, stringsAsFactors = FALSE)
@@ -161,8 +159,8 @@ head(df_count_data)</code></pre>
   </script>
 </div>
 </div>
-<div id="section-excel-files" class="section level3">
-<h3>Excel files</h3>
+<div id="section-spreadsheets" class="section level2">
+<h2>Spreadsheets</h2>
 <p>To import Excel files you can use the function <code>readxl</code> and <code>readxlsx</code> from the package <code>readxl</code>. Have a look at the screen shot below of the data stored in the worksheet <code>Velo_2019</code> in the range <code>C31:I54</code>.</p>
 <div class="figure">
 <img src="images/zahlstelle_xlsx.png" alt="Zahlstelle 908 Grenzacherstrasse (Kraftwerk)" width="50%" />
@@ -183,8 +181,8 @@ head(df_zahlstelle)</code></pre>
   </script>
 </div>
 </div>
-<div id="section-spatial-data" class="section level3">
-<h3>Spatial data</h3>
+<div id="section-spatial-data" class="section level2">
+<h2>Spatial data</h2>
 <p>To import spatial data you can use the function <code>st_read</code> from the package <code>sf</code>.</p>
 <pre class="r"><code># Read the data
 library(sf)</code></pre>
@@ -196,6 +194,103 @@ library(sf)</code></pre>
 
 plot(sf_canton)</code></pre>
 <p><img src="02_r_data_files/figure-html/readsf-example-shp-1.png" width="624" /></p>
+</div>
+<div id="section-batch-imports" class="section level2">
+<h2>Batch imports</h2>
+<p>From time to time data is stored in a set of files. Examples include a data sets per year or per location.</p>
+<p>Of course, it would be possible to create a data frame of each data sets and merge the data sets. An example is given in the script below. In the script, two data sets are read with the function <code>read_csv</code> and are merged with the function <code>bind_rows</code>. This function takes as arguments all the data sets that you would like to merge together.</p>
+<pre class="r"><code># Base directory
+df_counts_2020 &lt;- read_csv(&quot;data/zrh_verkehrszaehlungen_werte_fussgaenger_velo/2020_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   FK_ZAEHLER = col_character(),
+##   FK_STANDORT = col_double(),
+##   DATUM = col_datetime(format = &quot;&quot;),
+##   VELO_IN = col_double(),
+##   VELO_OUT = col_double(),
+##   FUSS_IN = col_double(),
+##   FUSS_OUT = col_double(),
+##   OST = col_double(),
+##   NORD = col_double()
+## )</code></pre>
+<pre class="r"><code>df_counts_2021 &lt;- read_csv(&quot;data/zrh_verkehrszaehlungen_werte_fussgaenger_velo/2021_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   FK_ZAEHLER = col_character(),
+##   FK_STANDORT = col_double(),
+##   DATUM = col_datetime(format = &quot;&quot;),
+##   VELO_IN = col_double(),
+##   VELO_OUT = col_double(),
+##   FUSS_IN = col_double(),
+##   FUSS_OUT = col_double(),
+##   OST = col_double(),
+##   NORD = col_double()
+## )</code></pre>
+<pre class="r"><code>df_counts_2020_2021 &lt;- dplyr::bind_rows(df_counts_2020,df_counts_2021)</code></pre>
+<p>However, in reality, you might want to merge a large number of data sets. Specify the name of each file would be cumbersome. Rather, you would like to get all the files in a certain folder and import these files. I’ll show this in the subsequent code snippets.</p>
+<pre class="r"><code># Base directory
+base_dir &lt;- &quot;data/zrh_verkehrszaehlungen_werte_fussgaenger_velo/&quot;
+# The data is stored in different folders
+#create a list of the files from the target directory
+df_of_files &lt;- list.files(path=base_dir, recursive = TRUE) %&gt;% 
+  data.frame() %&gt;%
+  rename(file_name=1) # Rename the first column to 
+
+df_of_files &lt;- df_of_files %&gt;%
+  filter(!grepl(&#39;~$&#39;, file_name, fixed=TRUE)) %&gt;%
+  filter(!grepl(&#39;Record&#39;, file_name, fixed=TRUE))%&gt;%
+  data.frame()
+
+list_of_files &lt;- as.list(df_of_files$file_name)</code></pre>
+<pre class="r"><code>  # Read the first file
+  # This is to have a base file to append the remaining files
+  file &lt;- list_of_files[1]
+
+  f &lt;- as.character(list_of_files[1]) 
+  print(paste(&quot;Reading&quot;,f,sep=&quot; &quot;))</code></pre>
+<pre><code>## [1] &quot;Reading 2009_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;</code></pre>
+<pre class="r"><code>  col_types &lt;- cols(
+  FK_ZAEHLER = col_character(),
+  FK_STANDORT = col_double(),
+  DATUM = col_datetime(format = &quot;&quot;),
+  VELO_IN = col_double(),
+  VELO_OUT = col_double(),
+  FUSS_IN = col_double(),
+  FUSS_OUT = col_double(),
+  OST = col_double(),
+  NORD = col_double()
+)
+  
+  # Read the first file
+  # Set the guess of the data types to a high column
+  df &lt;- readr::read_csv(paste0(base_dir,f), guess_max = 100000, col_types = col_types)
+  
+  
+  
+  # Loop over the files
+  for (i in 2:length(list_of_files)){
+    
+    # Get the file from lists
+    file &lt;- list_of_files[i]
+    f &lt;- as.character(file[1]) 
+    print(paste(&quot;Reading&quot;,f,sep=&quot; &quot;))
+    
+    df_loop &lt;- readr::read_csv(paste0(base_dir,f), guess_max = 100000, col_types = col_types)
+    
+    df &lt;- bind_rows(df,df_loop)
+  }</code></pre>
+<pre><code>## [1] &quot;Reading 2010_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2011_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2012_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2013_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2014_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2015_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2016_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2017_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2018_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2019_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2020_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;
+## [1] &quot;Reading 2021_verkehrszaehlungen_werte_fussgaenger_velo.csv&quot;</code></pre>
 
 <script type="application/shiny-prerendered" data-context="server-start">
 library(learnr)
@@ -224,7 +319,6 @@ session$onSessionEnded(function() {
 {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","blob","broom","cellranger","class","classInt","cli","colorspace","compiler","crayon","datasets","DBI","dbplyr","digest","dplyr","e1071","ellipsis","evaluate","fansi","fastmap","forcats","fs","generics","ggplot2","glue","graphics","grDevices","grid","gtable","haven","highr","hms","htmltools","htmlwidgets","httpuv","httr","jsonlite","KernSmooth","knitr","later","learnr","lifecycle","lubridate","magrittr","markdown","methods","mime","modelr","munsell","pillar","pkgconfig","promises","purrr","R6","Rcpp","readr","readxl","rematch","reprex","rlang","rmarkdown","rprojroot","rstudioapi","rvest","scales","sf","shiny","stats","stringi","stringr","tibble","tidyr","tidyselect","tidyverse","tools","units","utils","vctrs","withr","xfun","xml2","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.2.1","1.2.1","4.0.3","1.2.1","0.7.0","1.1.0","7.3-17","0.4-3","2.0.2","1.4-1","4.0.3","1.3.4","4.0.3","1.1.1","1.4.4","0.6.25","1.0.3","1.7-4","0.3.1","0.14","0.4.1","1.0.1","0.5.0","1.5.0","0.0.2","3.3.3","1.4.2","4.0.3","4.0.3","4.0.3","0.3.0","2.3.1","0.8","0.5.3","0.5.0","1.5.1","1.5.4","1.4.2","1.7.2","2.23-17","1.29","1.1.0.1","0.10.1","0.2.0","1.7.9","2.0.1","1.1","4.0.3","0.9","0.1.8","0.5.0","1.4.6","2.0.3","1.1.1","0.3.4","2.4.1","1.0.6","1.3.1","1.3.1","1.0.1","0.3.0","0.4.10","2.7","1.3-2","0.11","0.3.6","1.1.1","0.9-7","1.5.0","4.0.3","1.5.3","1.4.0","3.0.6","1.1.2","1.1.0","1.3.0","4.0.3","0.6-7","4.0.3","0.3.6","2.2.0","0.16","1.3.2","1.8-4","2.2.1"]}]}]}
 </script>
 <!--/html_preserve-->
-</div>
 </div>
 
 </div> <!-- topics -->
