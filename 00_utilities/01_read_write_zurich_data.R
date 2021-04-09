@@ -10,6 +10,7 @@ df_count_locations <- readr::read_csv("data/zurich_zahlstellen/taz.view_eco_stan
 df_count_locations_sel <- df_count_locations %>% dplyr::select(id1,korrekturfaktor,bezeichnung,geometry)
 
 # Base directory for the counts
+base_dir <- "data/zrh_verkehrszaehlungen_werte_fussgaenger_velo/"
 
 # Create a list of the files from the target directory
 df_of_files <- list.files(path=base_dir, recursive = TRUE) %>% 
@@ -77,6 +78,38 @@ df_agg_counts <- df %>%
   mutate(total_velo=VELO_IN,VELO_OUT)%>%
   mutate(year=lubridate::year(DATUM),
          month=lubridate::month(DATUM),
+         day=lubridate::day(DATUM))%>%
+  group_by(FK_STANDORT,FK_ZAEHLER,year,month,day)%>%
+  summarise(total_fuss=sum(total_fuss,na.rm = T),
+            total_velo=sum(total_velo,na.rm = T))%>% 
+  mutate(datum = lubridate::make_datetime(year, month, day))
+
+# Have a look at the data set
+head(df_agg_counts)
+
+# Write out the count locations
+df_agg_counts_filter <- df_agg_counts %>% filter(year>2017)
+
+# Join the data from count_locations
+df_agg_counts_filter <- df_agg_counts_filter %>% inner_join(df_count_locations_sel,by=c("FK_STANDORT"="id1"))
+head(df_agg_counts_filter)
+
+#####
+# Write out the demo data set
+####
+readr::write_csv(df_agg_counts_filter,"data/zurich_aggregated_2018_2021.csv")
+
+
+# Aggregate the counts
+df_agg_counts <- df %>%
+  mutate(VELO_IN = na_if(VELO_IN, 0))%>%
+  mutate(VELO_OUT = na_if(VELO_OUT, 0))%>%
+  mutate(FUSS_IN = na_if(FUSS_IN, 0))%>%
+  mutate(FUSS_OUT = na_if(FUSS_OUT, 0))%>%
+  mutate(total_fuss=FUSS_IN,FUSS_OUT)%>%
+  mutate(total_velo=VELO_IN,VELO_OUT)%>%
+  mutate(year=lubridate::year(DATUM),
+         month=lubridate::month(DATUM),
          day=lubridate::day(DATUM),
          hour=lubridate::hour(DATUM))%>%
   group_by(FK_STANDORT,FK_ZAEHLER,year,month,day,hour)%>%
@@ -97,7 +130,7 @@ head(df_agg_counts_filter)
 #####
 # Write out the demo data set
 ####
-readr::write_csv(df_agg_counts_filter,"data/zurich_aggregated_2018_2021.csv")
+readr::write_csv(df_agg_counts_filter,"data/zurich_aggregated_2018_2021_hour.csv")
 
 #####
 # Write out aggregated yearly data sets
