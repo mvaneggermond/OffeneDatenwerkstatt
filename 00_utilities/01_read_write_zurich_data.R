@@ -82,22 +82,23 @@ df_agg_counts <- df %>%
   group_by(FK_STANDORT,FK_ZAEHLER,year,month,day)%>%
   summarise(total_fuss=sum(total_fuss,na.rm = T),
             total_velo=sum(total_velo,na.rm = T))%>% 
-  mutate(datum = lubridate::make_datetime(year, month, day))
-
+  mutate(datum = lubridate::make_datetime(year, month, day))%>%
+  dplyr::rename(fk_standort=FK_STANDORT)%>%
+  dplyr::rename(fk_zaehler=FK_ZAEHLER)
 # Have a look at the data set
 head(df_agg_counts)
 
 # Write out the count locations
-df_agg_counts_filter <- df_agg_counts %>% filter(year>2017)
+df_agg_counts_filter <- df_agg_counts %>% filter(year>2009)
 
 # Join the data from count_locations
-df_agg_counts_filter <- df_agg_counts_filter %>% inner_join(df_count_locations_sel,by=c("FK_STANDORT"="id1"))
+df_agg_counts_filter <- df_agg_counts_filter %>% inner_join(df_count_locations_sel,by=c("fk_standort"="id1"))
 head(df_agg_counts_filter)
 
 #####
 # Write out the demo data set
 ####
-readr::write_csv(df_agg_counts_filter,"data/zurich_aggregated_2018_2021.csv")
+readr::write_csv(df_agg_counts_filter,"data/zurich_aggregated_2009_2021.csv")
 
 
 # Aggregate the counts
@@ -124,7 +125,7 @@ head(df_agg_counts)
 df_agg_counts_filter <- df_agg_counts %>% filter(year>2017)
 
 # Join the data from count_locations
-df_agg_counts_filter <- df_agg_counts_filter %>% inner_join(df_count_locations_sel,by=c("FK_STANDORT"="id1"))
+df_agg_counts_filter <- df_agg_counts_filter %>% inner_join(df_count_locations_sel,by=c("fk_standort"="id1"))
 head(df_agg_counts_filter)
 
 #####
@@ -160,7 +161,9 @@ for (i in 1:length(list_of_files)){
     group_by(FK_ZAEHLER,FK_STANDORT,year,month,day,hour)%>%
     summarise(total_fuss=sum(total_fuss,na.rm = T),
               total_velo=sum(total_velo,na.rm = T))%>% 
-    mutate(datum = lubridate::make_datetime(year, month, day, hour))
+    mutate(datum = lubridate::make_datetime(year, month, day, hour))%>%
+    dplyr::rename(fk_standort=FK_STANDORT)%>%
+    dplyr::rename(fk_zaehler=FK_ZAEHLER)
   
   # Write the file
   readr::write_csv(df_agg_counts,paste0("data/zurich_processed/aggregated_",f))
