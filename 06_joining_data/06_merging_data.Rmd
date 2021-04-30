@@ -1,0 +1,122 @@
+---
+title: "Merging data"
+author: "Michael van Eggermond"
+date: "24/03/2021"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+
+```{r setup, include=FALSE, eval=TRUE}
+library(learnr)
+library(tidyverse)
+library(lubridate)
+library(scales)
+
+checker <- function(label, user_code, check_code, envir_result, evaluate_result, ...) {
+  list(message = check_code, correct = TRUE, location = "append")
+}
+
+tutorial_options(exercise.timelimit = 60, exercise.checker = checker)
+
+knitr::opts_chunk$set(echo = FALSE)
+
+# See this issue here: https://github.com/rstudio/learnr/issues/99
+df_counts_basel <- readr::read_csv("https://drive.google.com/uc?id=18X-7Sevy7pegtK2J-Rv-ieG8bpaJozxZ&export=download")
+df_wetter_basel <- readr::read_csv("https://drive.google.com/uc?id=14ligSPsFPM0AOnlgQBUR6g90uq8AdZw4&export=download") %>%
+  filter(Year>2017)%>%
+  mutate(temperature=Temperature)%>%
+  mutate(measure="Temperature")
+
+df_counts_basel_viaduct_month <- df_counts_basel %>% 
+  filter(SiteName=='902 Viaduktstrasse')%>%
+  group_by(SiteName,Year,Month)%>%
+  summarise(total_cyclists=sum(ValuesApproved,na.rm = T))%>%
+  mutate(measure="Monthly cyclists")
+
+
+df_counts_basel_viaduct_month_viaduct <- df_counts_basel %>% 
+  filter(SiteName=='902 Viaduktstrasse')%>%
+  group_by(SiteName,Year,Month)%>%
+  summarise(total_cyclists=sum(ValuesApproved,na.rm = T))%>%
+  mutate(measure="Monthly cyclists")
+
+df_counts_basel_viaduct_month_viaduct <- df_counts_basel %>% 
+  filter(SiteName=='902 Viaduktstrasse')%>%
+  group_by(SiteName,Year,Month)%>%
+  summarise(total_cyclists=sum(ValuesApproved,na.rm = T))%>%
+  mutate(measure="Monthly cyclists")
+
+
+head(df_counts_basel_viaduct_month)
+
+```
+
+
+## Welcome
+https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales
+In this tutorial we will look at the merging of data sets in R. 
+
+I will first cover some key concepts to consider when merging data. Once these concepts are covered, I 'll continue with some practicial examples.
+
+## Why merge data?
+
+There are a range of reasons to merge different data sets. I will discuss two main reasons from my point 
+
+## Key concepts
+
+There are two main ways of looking at the merging of data:
+
+* Making your data set longer: adding rows to your data set.    
+* Making your data set wider: adding columns to your data.
+
+I illustrated these concepts in the figure below. 
+
+
+In general, but this is my opinion, what is best, depends on the purpose:
+
+* If you would like to merge multiple data sets that contain similar data (e.g. traffic counts per year), appending the data sets (binding the rows), is the way to go.
+* If you would like to conduct statistical tests or estimate models with variables present in different data sets, you will need to join the data sets. 
+* If you would like to visualize data and visualize different measurements, merging rows is the way to go. In these cases, merging data sets row wise is preferred. More precisely, you would like to have **long** data. This will be covered in a seperate tutorial.
+
+
+## An example
+
+Suppose we have two data sets:
+
+1. The first data set contains the temperature and precipitation (rainfall) . I downloaded this data from Swiss Meteo [here](https://www.meteoschweiz.admin.ch/product/output/climate-data/homogenous-monthly-data-processing/data/homog_mo_BAS.txt)
+2. The second data set contains the number of cyclists per month on the Viaductstrasse in Basel. The counts have been aggregated 
+
+
+
+```{r select-1-solution}
+# Dual axis plot with ggplot
+# A better solution can be found here: https://stackoverflow.com/questions/58774705/y-limits-for-ggplot-with-sec-axis
+df_join_counts_wetter <- dplyr::inner_join(df_counts_basel_viaduct_month,df_wetter_basel, by=c("Year"="Year","Month"="Month")) %>% filter(Year=='2019')
+
+
+min(df_join_counts_wetter$total_cyclists)
+max(df_join_counts_wetter$total_cyclists)
+min(df_join_counts_wetter$temperature)
+max(df_join_counts_wetter$temperature)
+
+
+ylim.prim <- c(140000, 260000)   # in this example, precipitation
+ylim.sec <- c(0,20)    # in this example, temperature
+
+
+b <- diff(ylim.prim)/diff(ylim.sec)
+a <- ylim.prim[1] - b*ylim.sec[1] # there was a bug here
+
+ggplot(df_join_counts_wetter, aes(Month, total_cyclists)) +
+  geom_col() +
+  geom_line(aes(y = a + temperature*b), color = "red") +
+  scale_y_continuous("Number of cyclists", sec.axis = sec_axis(~ (. - a)/b, name = "Temperature")) +
+  scale_x_continuous("Month", breaks = 1:12) 
+```
+
+
+## Binding data
+
+
+## Joining data

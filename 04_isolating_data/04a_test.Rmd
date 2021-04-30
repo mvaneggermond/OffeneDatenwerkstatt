@@ -1,0 +1,46 @@
+---
+title: "Working with data"
+author: "Michael van Eggermond"
+date: "09/04/2021"
+output: 
+    learnr::tutorial:
+      progressive: true
+      allow_skip: true
+      df_print: default
+runtime: shiny_prerendered
+---
+```{css, echo=FALSE}
+p.caption {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: grey;
+  margin-right: 10%;
+  margin-left: 0%;  
+  text-align: left;
+}
+```
+
+
+```{r setup, include=FALSE, eval=TRUE}
+library(learnr)
+library(tidyverse)
+library(lubridate)
+library(scales)
+library(babynames)
+
+checker <- function(label, user_code, check_code, envir_result, evaluate_result, ...) {
+  list(message = check_code, correct = TRUE, location = "append")
+}
+
+tutorial_options(exercise.timelimit = 60, exercise.checker = checker)
+
+knitr::opts_chunk$set(echo = FALSE)
+
+# See this issue here: https://github.com/rstudio/learnr/issues/99
+df_counts_zurich <- readr::read_csv("https://www.dropbox.com/s/lp3wcwth65ys468/zurich_aggregated_2018_2021.csv?dl=1")
+
+#write.csv(tmp.df, "zurich_aggregated_2018_2021.csv", row.names=F)
+#rm(list=ls())
+
+
+```

@@ -72,7 +72,7 @@ df_agg_counts_filter <- df %>%
 readr::write_csv(df_agg_counts_filter,"data/zurich_miv_2012_2021.csv")
 # Write out the count locations
 df_agg_counts_filter <- df %>% 
-  dplyr::mutate(year=lubridate::year(LieferDat)) %>% 
+  dplyr::mutate(year=lubridate::year(MessungDatZeit)) %>% 
   dplyr::filter(year>2017)
 
 df_agg_counts_filter %>% group_by(year)%>% summarise(n=n())
