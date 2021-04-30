@@ -4,6 +4,16 @@ author: "Michael van Eggermond"
 date: "4/30/2021"
 output: html_document
 ---
+```{css, echo=FALSE}
+p.caption {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: grey;
+  margin-right: 10%;
+  margin-left: 0%;  
+  text-align: left;
+}
+```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
