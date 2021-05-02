@@ -74,8 +74,6 @@ knitr::include_graphics("images/adding_rows.png")
 
 ```
 
-
-
 In general, but this is my opinion, what is best, depends on the purpose:
 
 * If you would like to merge multiple data sets that contain similar data (e.g. traffic counts per year), appending the data sets (binding the rows), is the way to go.

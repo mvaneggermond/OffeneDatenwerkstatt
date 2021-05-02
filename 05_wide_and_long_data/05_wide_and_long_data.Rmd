@@ -1,7 +1,7 @@
 ---
 title: "Wide and long data"
 author: "Michael van Eggermond"
-date: "24/03/2021"
+date: "02/05/2021"
 output: learnr::tutorial
 runtime: shiny_prerendered
 ---
@@ -62,7 +62,12 @@ df_google_mobility_zh <- df_google_mobility %>% filter(iso_3166_2_code=='CH-ZH')
          -country_region,
          -sub_region_2,-metro_area,-iso_3166_2_code,-census_fips_code,-place_id)
 
-
+df_google_mobility_bs_long <- df_google_mobility_bs %>% pivot_longer(-c("date","sub_region_1"))  %>% 
+  mutate(day=lubridate::wday(date, label = TRUE, abbr = TRUE),
+         month=lubridate::month(date, label = TRUE, abbr = TRUE),
+         year=lubridate::year(date))
+  #mutate(!day%in%c("Sat","Sun"))%>%
+  #filter(name%in%c('transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline'))
 ```
 ## Welcome
 
@@ -95,12 +100,157 @@ If you would like to learn more about tidy data, I can recommend the paper 'Tidy
 
 ## An example
 
+As an example in this tutorial I will use the Google Mobility reports. I downloaded the data sets [here](https://www.google.com/covid19/mobility/){target="_blank"} and merged them with the script [here](https://github.com/mvaneggermond/OffeneDatenwerkstatt/blob/master/00_utilities/05_read_write_google_mobility_data.R){target="_blank"}. The Google Mobility reports '..... aim to provide insights into what has changed in response to policies aimed at combating COVID-19. The reports chart movement trends over time by geography, across different categories of places such as retail and recreation, groceries and pharmacies, parks, transit stations, workplaces, and residential ....'.
+
+Looking at the data for the first couple of days, you will note that the data set contains the following variables:
+
+* retail_and_recreation_percent_change_from_baseline
+* grocery_and_pharmacy_percent_change_from_baseline
+* parks_percent_change_from_baseline
+* transit_stations_percent_change_from_baseline
+* workplaces_percent_change_from_baseline
+* residential_percent_change_from_baseline
 
 ```{r google_wide, echo=FALSE,message=FALSE}
-df_google_mobility_bs
+df_google_mobility_bs  %>% filter(date<'2020-02-17')
 ```
 
+Now we can reshape this data, such that the different measures are stored in a single column, called `name` and the value associated with the measure is stored in the column `name`. This makes it much easier to summarise by day, month and aggregate values, but it makes also much easier to plot
 
 ```{r google_long, echo=FALSE,message=FALSE}
-df_google_mobility_bs %>% pivot_longer(-c("date","sub_region_1")) %>% filter(date='2020-02-15')
+df_google_mobility_bs %>% pivot_longer(-c("date","sub_region_1")) %>% 
+  filter(date<'2020-02-17')
 ```
+
+Have a look at the plot below. I made this plot with the package `ggplot`. The arguments that `ggplot` requires, in this case, are the data frame (`df_google_mobility_bs_long`), the variable containing x (`date`) and the variable contain y(`value`) and the variable containg the indicator (`name`).
+
+```{r fig-google-mobility-reports, echo=TRUE,message=FALSE,warning=FALSE}
+
+ggplot(df_google_mobility_bs_long,aes(x=date,y=value,colour=name))+
+  geom_line()+
+  geom_smooth()+
+  theme_bw()+
+  theme(legend.position="bottom")
+
+```
+
+Alternatively, you can easily summarize the data. Have a look at the code below. 
+
+```{r google-mobility-reports-summarise, echo=TRUE,message=FALSE,warning=FALSE}
+
+df_google_mobility_bs_long %>%
+  group_by(year,month,name)%>%
+  summarise(mean=mean(value,na.rm=T))
+```
+
+## From wide to long
+
+We will use the function `pivot_longer()` to convert our data from wide to long format. There are a number of conceptual steps to convert your data to long format. 
+
+It starts with identify the columns in your data set. In the data set `df_google_mobility_bs_long` we have the following columns:
+
+* Date (`date`): the date
+* The region (`sub_region_1`): the region
+* A series of mobility indicators: 
+   * retail_and_recreation_percent_change_from_baseline
+   * grocery_and_pharmacy_percent_change_from_baseline
+   * parks_percent_change_from_baseline
+   * transit_stations_percent_change_from_baseline
+   * workplaces_percent_change_from_baseline
+   * residential_percent_change_from_baseline
+
+
+```{r google_example, echo=FALSE,message=FALSE}
+df_google_mobility_bs  %>% filter(date<'2020-02-17')
+```
+
+Second, we need to identify the columns we would like to pivot (rotate). In this example, these are the columns:  `retail_and_recreation_percent_change_from_baseline`, `grocery_and_pharmacy_percent_change_from_baseline`, `parks_percent_change_from_baseline`,  `transit_stations_percent_change_from_baseline`,  `workplaces_percent_change_from_baseline` and `residential_percent_change_from_baseline`. 
+
+In the function `pivot_longer()` these columns are specified with the argument `cols`. The cols argument controls which columns `pivot_longer()` pivots.
+
+The code snippet below shows how the `cols()` argument is used.  Note that we pass a vector of column names.
+
+```{r google_long_code, echo=TRUE,message=FALSE, results='hide'}
+df_google_mobility_bs  %>% 
+  pivot_longer(cols=c("retail_and_recreation_percent_change_from_baseline", 
+                      "grocery_and_pharmacy_percent_change_from_baseline", 
+                      "parks_percent_change_from_baseline",  
+                      "transit_stations_percent_change_from_baseline",  
+                      "workplaces_percent_change_from_baseline" , 
+                      "residential_percent_change_from_baseline"))
+```
+
+This will result in a tibble with the columns `date`, `sub_region_1`, `name` and `value`, as shown below:
+
+```{r google_long_results, echo=FALSE, exercise=TRUE, exercise.eval = FALSE,results='asis'}
+df_google_mobility_bs  %>% 
+  pivot_longer(cols=c("retail_and_recreation_percent_change_from_baseline", 
+                      "grocery_and_pharmacy_percent_change_from_baseline", 
+                      "parks_percent_change_from_baseline",  
+                      "transit_stations_percent_change_from_baseline",  
+                      "workplaces_percent_change_from_baseline" , 
+                      "residential_percent_change_from_baseline"))
+```
+
+
+Third, it is possible to change the name of the `name` column and the `value` column using the `names_to()` function and the `values_to()` function. In the example below, I changed the columns `value` to `percentage_change` and the `name` to `indicators`.
+
+
+```{r google_long_code, echo=TRUE,message=FALSE, exercise=TRUE, exercise.eval = FALSE,results='asis'}
+df_google_mobility_bs  %>% 
+  pivot_longer(cols=c("retail_and_recreation_percent_change_from_baseline", 
+                      "grocery_and_pharmacy_percent_change_from_baseline", 
+                      "parks_percent_change_from_baseline",  
+                      "transit_stations_percent_change_from_baseline",  
+                      "workplaces_percent_change_from_baseline" , 
+                      "residential_percent_change_from_baseline"),
+               names_to = "indicator",
+               values_to = "percentage_change")
+```
+
+Usually, there are quite a number of columns that you would like to convert to long. Fortunately, there are some conveniences. 
+
+First, you can use the `starts_with()` or `ends_with()` functions. In this case, all columns end with `baseline`, so you can use this to pivot your data. 
+
+```{r google_long2wide_ends_with, echo=FALSE, exercise=TRUE, exercise.eval = FALSE,results='asis'}
+
+df_google_mobility_bs  %>% 
+  pivot_longer(cols=ends_with("baseline"))
+```
+
+Alternatively, you can select the columns you do not want to pivot using the `-` in front of the vector of columns  `c`  you do not want to select. In this case, we do not want to select the columns `date` and `sub_region_1`). 
+
+```{r google_long2wide_minus, echo=FALSE, exercise=TRUE, exercise.eval = FALSE,results='asis'}
+df_google_mobility_bs %>% 
+  pivot_longer(cols=-c("date","sub_region_1")) 
+```
+
+## From long to wide
+
+`pivot_wider()` is the inverse of `pivot_longer()`. `pivot_longer()` moves data from column names to cell values, while `pivot_wider()` pulls data from cell values into column names, creating a wider tibble (Taken from [here](https://dcl-wrangle.stanford.edu/pivot-basic.html#wider){target="_blank"})
+
+You’ll likely use `pivot_longer()` more often than `pivot_wider()` when tidying. Often, you’ll actually use pivot_wider() to un-tidy data. The non-tidy format may be more convenient for some tasks (e.g., creating a specific visualization).
+
+The code is more or less the same. In it's most basic version, you simply type `pivot_wider()`.
+```{r google_long2wide, echo=TRUE,message=FALSE, results='hide'}
+df_google_mobility_bs_long %>% 
+  pivot_wider() 
+```
+
+If the columns you would like to pivot are named differently, you need to use the  `names_from()` and `values_from()` arguments as shown below.  
+
+```{r google_long2wide, echo=TRUE,message=FALSE, results='hide'}
+df_google_mobility_bs_long %>% 
+  pivot_wider(
+    names_from='name',
+    values_from = 'value') 
+```
+
+## Conclusion
+
+Long and wide data refers to the shape of your data set. Which data format is better, depends on the purpose. In my opinion:
+
+* If you would like to conduct statistical tests or estimate models with variables present in different column, you will likely need to use long data.
+* If you would like to visualize data and visualize different measurements, merging rows is the way to go. You would likely need **long** data. 
+
+We didn't cover advanced topics in this tutorial, such as pivoting columns in multiple key-value pairs. If you would like to learn more about this, get in touch!

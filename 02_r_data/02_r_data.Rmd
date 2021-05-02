@@ -94,7 +94,7 @@ From time to time data is stored in a set of files. Examples include a data sets
 Of course, it would be possible to create a data frame of each data sets and merge the data sets. An example is given in the script below. In the script, two data sets are read with the function `read_csv` and are merged with the function `bind_rows`. This function takes as arguments all the data sets that you would like to merge together. 
 
 
-```{r read-two-files, echo=TRUE}
+```{r read-two-files, echo=TRUE, results='hide'}
 
 # Base directory
 
