@@ -397,9 +397,9 @@ df_year_join_counts_wetter
 
 ## Summary
 
-The dplyr data transformation cheat sheet provides a nice visual synopsis of the 
+The dplyr data transformation cheat sheet provides a nice visual synopsis of the c
 
-```{r fig-cheat-sheet-variables, echo = FALSE, out.width = "100%", fig.cap = "Excerpt from dpyr's cheat sheet"}
+```{r fig-cheat-sheet-variables, echo = FALSE, out.width = "50%", fig.cap = "Excerpt from dpyr's cheat sheet"}
 
 knitr::include_graphics("images/dplyr_join_cheat_sheet.png")
 

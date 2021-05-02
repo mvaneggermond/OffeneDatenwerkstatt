@@ -1,8 +1,9 @@
 ---
-title: "Untitled"
+title: "Wide and long data"
 author: "Michael van Eggermond"
-date: "4/30/2021"
-output: html_document
+date: "24/03/2021"
+output: learnr::tutorial
+runtime: shiny_prerendered
 ---
 ```{css, echo=FALSE}
 p.caption {
@@ -15,31 +16,91 @@ p.caption {
 }
 ```
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, eval=TRUE}
+library(learnr)
+library(tidyverse)
+library(lubridate)
+library(scales)
+
+checker <- function(label, user_code, check_code, envir_result, evaluate_result, ...) {
+  list(message = check_code, correct = TRUE, location = "append")
+}
+
+tutorial_options(exercise.timelimit = 60, exercise.checker = checker)
+
+knitr::opts_chunk$set(echo = FALSE)
+
+# See this issue here: https://github.com/rstudio/learnr/issues/99
+
+df_google_mobility <- readr::read_csv("https://drive.google.com/uc?id=11w225uoN_TtJd5QyvJHuYprL4d5rQTbi&export=download",
+                           col_types = cols(
+                             country_region_code = col_character(),
+                             country_region = col_character(),
+                             sub_region_1 = col_character(),
+                             sub_region_2 = col_logical(),
+                             metro_area = col_logical(),
+                             iso_3166_2_code = col_character(),
+                             census_fips_code = col_logical(),
+                             place_id = col_character(),
+                             date = col_date(),
+                             retail_and_recreation_percent_change_from_baseline = col_double(),
+                             grocery_and_pharmacy_percent_change_from_baseline = col_double(),
+                             parks_percent_change_from_baseline = col_double(),
+                             transit_stations_percent_change_from_baseline = col_double(),
+                             workplaces_percent_change_from_baseline = col_double(),
+                             residential_percent_change_from_baseline = col_double()
+                           ))
+
+df_google_mobility_bs <- df_google_mobility %>% 
+  filter(iso_3166_2_code=='CH-BS') %>% 
+  select(-country_region_code,
+         -country_region,
+         -sub_region_2,-metro_area,-iso_3166_2_code,-census_fips_code,-place_id)
+
+df_google_mobility_zh <- df_google_mobility %>% filter(iso_3166_2_code=='CH-ZH')%>% 
+  select(-country_region_code,
+         -country_region,
+         -sub_region_2,-metro_area,-iso_3166_2_code,-census_fips_code,-place_id)
+
+
 ```
-Using R's most popular plotting library `ggplot`, but also when using other software, such as `Tableau` or `Spotfire` you would like to have your data as follows:
+## Welcome
 
-* The dimension you would like to visualise is stored in columns
-* The measure you would like to visualise is stored in a second column. These measures can be temparature
+In this tutorial we will look briefly at **wide** and **long** data sets. These concepts refer to the 'shape' of the data set, not to the contents themselves. Over the years, there have been a number of packages to help you to reshape your data. These include `reshape`, `reshape2` and `tidyr`. We will look into the usage of `tidyr` in this tutorial. 
+
+I'll start with the concepts, then move on to an example and finally show how can reshape your data set. 
 
 
-## R Markdown
+## Underlying concept
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+In general, data comes in two formats: 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Wide: in this format, many variables are stored in separate columns. Numerous examples exist: count location can be stored in columns, data of multiple years can be stored in columns, etc. Data in wide format is often hard to analyze and summarize. 
 
-```{r cars}
-summary(cars)
+
+```{r fig-wide, echo = FALSE, out.width = "50%", fig.cap = "Wide data"}
+
+knitr::include_graphics("images/wide_data.png")
+
+```
+Long: in this format, one column contains all the values and another column contains the context of the value. This format lends itself much better for analysis and visualization with the R package `ggplot` and software such as Tableau. More and more, you will see open data being made as long data. 
+
+```{r fig-long, echo = FALSE, out.width = "50%", fig.cap = "Long data"}
+
+knitr::include_graphics("images/long_data.png")
+
 ```
 
-## Including Plots
+If you would like to learn more about tidy data, I can recommend the paper 'Tidy data' by Hadley Wickham, available [here](https://www.jstatsoft.org/article/view/v059i10){target="_blank"}.
 
-You can also embed plots, for example:
+## An example
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+```{r google_wide, echo=FALSE,message=FALSE}
+df_google_mobility_bs
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r google_long, echo=FALSE,message=FALSE}
+df_google_mobility_bs %>% pivot_longer(-c("date","sub_region_1")) %>% filter(date='2020-02-15')
+```
