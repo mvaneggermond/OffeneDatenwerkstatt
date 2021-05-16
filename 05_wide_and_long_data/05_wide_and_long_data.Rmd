@@ -130,7 +130,8 @@ ggplot(df_google_mobility_bs_long,aes(x=date,y=value,colour=name))+
   geom_line()+
   geom_smooth()+
   theme_bw()+
-  theme(legend.position="bottom")
+  theme(legend.position="bottom")+
+  guides(colour=guide_legend(ncol=2))
 
 ```
 
@@ -170,7 +171,7 @@ In the function `pivot_longer()` these columns are specified with the argument `
 
 The code snippet below shows how the `cols()` argument is used.  Note that we pass a vector of column names.
 
-```{r google_long_code, echo=TRUE,message=FALSE, results='hide'}
+```{r google_long_code_base, echo=TRUE,message=FALSE, results='hide'}
 df_google_mobility_bs  %>% 
   pivot_longer(cols=c("retail_and_recreation_percent_change_from_baseline", 
                       "grocery_and_pharmacy_percent_change_from_baseline", 
@@ -239,7 +240,7 @@ df_google_mobility_bs_long %>%
 
 If the columns you would like to pivot are named differently, you need to use the  `names_from()` and `values_from()` arguments as shown below.  
 
-```{r google_long2wide, echo=TRUE,message=FALSE, results='hide'}
+```{r google_long2wide_name_value, echo=TRUE,message=FALSE, results='hide'}
 df_google_mobility_bs_long %>% 
   pivot_wider(
     names_from='name',

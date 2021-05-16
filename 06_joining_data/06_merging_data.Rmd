@@ -30,6 +30,10 @@ tutorial_options(exercise.timelimit = 60, exercise.checker = checker)
 
 knitr::opts_chunk$set(echo = FALSE)
 
+# Google
+df_google_2020 <- readr::read_csv("https://drive.google.com/uc?id=1vZ55zWp0yKPGuMVoc8NGnW_Lk_SVMWlP&export=download")
+df_google_2021 <- readr::read_csv("https://drive.google.com/uc?id=10a6RjZ1ObVsvh9A47p7vVmnm3NrZhiVZ&export=download")
+
 # See this issue here: https://github.com/rstudio/learnr/issues/99
 df_counts_basel <- readr::read_csv("https://drive.google.com/uc?id=18X-7Sevy7pegtK2J-Rv-ieG8bpaJozxZ&export=download")
 df_wetter_basel <- readr::read_csv("https://drive.google.com/uc?id=14ligSPsFPM0AOnlgQBUR6g90uq8AdZw4&export=download") %>%
@@ -44,6 +48,17 @@ df_counts_basel_viaduct_month <- readr::read_csv("https://drive.google.com/uc?id
 df_counts_basel_filter <- df_counts_basel_viaduct_month %>%
   filter(Year>=2019,Year<2021) %>%
   filter(!Month%in%c(2,3,4))
+
+library(tidyverse)
+df_counts_basel_group <- df_counts_basel$ %>%
+  #filter(SiteName=='902 Viaduktstrasse',Year==2019)%>%
+  group_by(SiteName,Year,Month)%>%
+  summarise(total_cyclists=sum(total_cyclists,na.rm = T))%>%
+  mutate(year_month=lubridate::make_date(year=Year,month=Month))
+
+df_counts_weather <- dplyr::inner_join(df_counts_basel,df_wetter_basel)
+
+write.csv(df_counts_weather,"data/wetter_test.csv")
 
 ```
 
@@ -373,12 +388,12 @@ Have a look at the example below. In this case, I omitted the column `Month` fro
 
 ```{r example-join-rows, exercise = TRUE, exercise.eval = FALSE,results = "asis"}
 # Input 1
-nrow(df_counts_basel_viaduct_month_viaduct)
+nrow(df_counts_basel_viaduct_month)
 # Input 2
 nrow(df_wetter_basel)
 
 # Join the table df_counts_basel_viaduct_month and df_wetter_basel
-df_year_join_counts_wetter <- dplyr::inner_join(df_counts_basel_viaduct_month_viaduct,df_wetter_basel, by = c("Year")) 
+df_year_join_counts_wetter <- dplyr::inner_join(df_counts_basel_viaduct_month,df_wetter_basel, by = c("Year")) 
 
 # Number of rows from the join
 nrow(df_year_join_counts_wetter)
@@ -389,13 +404,55 @@ df_year_join_counts_wetter
 
 ## Binding rows
 
+On occasion, you might need to merge the rows of different data sets in a row-based fashion: you will need to append rows. For instance, this can be the case when you receive a data set for each year or each region.
+
+To this end, you can use the function `bind_rows()`. As the function name implies, you bind the rows of multiple data sets. It doesn't matter if the rows are not in the same sequence. Variables with the same should have the same data type.
+
+As an example in this tutorial I will use the Google Mobility reports. I downloaded the data sets [here](https://www.google.com/covid19/mobility/){target="_blank"} and selected on the data for Basel-Stadt. The Google Mobility reports '..... aim to provide insights into what has changed in response to policies aimed at combating COVID-19. The reports chart movement trends over time by geography, across different categories of places such as retail and recreation, groceries and pharmacies, parks, transit stations, workplaces, and residential ....'.
+
+Looking at the data for the first couple of days, you will note that the data set contains the following variables:
+
+* retail_and_recreation_percent_change_from_baseline
+* grocery_and_pharmacy_percent_change_from_baseline
+* parks_percent_change_from_baseline
+* transit_stations_percent_change_from_baseline
+* workplaces_percent_change_from_baseline
+* residential_percent_change_from_baseline
+
+
+The data for 2020 is shown below. 
+
+```{r google_2020, echo=FALSE,message=FALSE}
+df_google_2020 %>% relocate(date)
+```
+
+The data for 2021 is shown below and in exactly the same format. 
+
+```{r google_2021, echo=FALSE,message=FALSE}
+df_google_2021 %>% relocate(date)
+```
+
+You can append the second data set to the first data set. You can as much data sets as you want to the `bind_rows()` function.
+
+```{r example_bind_rows, exercise = TRUE, exercise.eval = FALSE,results = "asis"}
+
+df_google_2020_2021 <- bind_rows(df_google_2020,df_google_2021)
+
+nrow(df_google_2020)
+
+nrow(df_google_2021)
+
+
+nrow(df_google_2020_2021)
+```
 
 ## Binding columns
 
+I won't go into detail here.
 
 ## Summary
 
-The dplyr data transformation cheat sheet provides a nice visual synopsis of the c
+The dplyr data transformation cheat sheet provides a good visual synopsis of the concepts presented in this tutorial.
 
 ```{r fig-cheat-sheet-variables, echo = FALSE, out.width = "50%", fig.cap = "Excerpt from dpyr's cheat sheet"}
 
